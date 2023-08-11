@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useUserContext } from '../context/userContext'
 import { toast } from 'react-toastify';
@@ -10,11 +10,21 @@ const SignUp = () => {
 
   const { signUp, googleLogIn } = useUserContext();
   const navigate = useNavigate();
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const { user } = useUserContext();
 
+  useEffect(() => {
+    if (user) {
+      // If user is already logged in, redirect to home page
+      navigate('/');
+    }
+  }, [user, navigate]);
 
   const validationSchema = Yup.object().shape({
+    name: Yup.string().required('Name is required'),
     email: Yup.string().email('Invalid email').required('Email is required'),
     password: Yup.string()
       .min(6, 'Password must be at least 6 characters')
@@ -22,16 +32,22 @@ const SignUp = () => {
       .matches(/[A-Z]/, 'Password must contain at least one uppercase letter')
       .matches(/\d/, 'Password must contain at least one number')
       .required('Password is required'),
+    confirmPassword: Yup.string()
+      .oneOf([Yup.ref('password'), null], 'Passwords must match')
+      .required('Confirm Password is required'),
   });
 
   const isFormValid = async () => {
     try {
-      await validationSchema.validate({ email, password }, { abortEarly: false });
+      await validationSchema.validate(
+        { name, email, password, confirmPassword },
+        { abortEarly: false }
+      );
       return true;
     } catch (err) {
-      return err.errors; // Return the array of error messages
+      return err.errors;
     }
-  }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -43,28 +59,23 @@ const SignUp = () => {
       });
     } else {
       try {
-        await signUp(email, password);
-        navigate('/home');
+        await signUp(name, email, password); // Use the signUp function from your context
+        navigate('/');
       } catch (err) {
         toast.error(err.message);
       }
     }
-  }
-
-
+  };
 
   const handleGoogleLogIn = async (e) => {
     e.preventDefault();
     try {
       await googleLogIn();
-      navigate('/home')
+      navigate('/');
     } catch (err) {
-      toast.error(err.message)
+      toast.error(err.message);
     }
-  }
-
-
-
+  };
 
   return (
     <>
@@ -96,6 +107,26 @@ const SignUp = () => {
               </p>
               <form onSubmit={handleSubmit} className="mt-8">
                 <div className="space-y-5">
+                <div>
+                    <label
+                      htmlFor="Full Name"
+                      className="text-base font-medium text-gray-900"
+
+                    >
+                      Full Name
+                    </label>
+                    <div className="mt-2">
+                      <input
+                        className="flex h-10 w-full rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
+                        type="name"
+                        placeholder="Enter you Full Name"
+                        id="fullanme"
+                        value={name}
+                        onChange={(e) => setName (e.target.value)  }
+                      />
+                    </div>
+                  </div>
+
                   <div>
                     <label
                       htmlFor="email"
@@ -133,6 +164,25 @@ const SignUp = () => {
                         id="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                      />
+                    </div>
+                    <div className="mt-2 flex items-center justify-between">
+                      <label
+                        htmlFor="ConfirmPassword"
+                        className="text-base font-medium text-gray-900"
+
+                      >
+                        Confirm Password
+                      </label>
+                    </div>
+                    <div className="mt-2">
+                      <input
+                        className="flex h-10 w-full rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
+                        type="password"
+                        placeholder="Confirm Password"
+                        id=" Confirm Password "
+                        value={confirmPassword }
+                        onChange={(e) => setConfirmPassword(e.target.value)}
                       />
                     </div>
                   </div>

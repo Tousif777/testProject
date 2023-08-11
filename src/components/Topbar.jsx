@@ -1,22 +1,18 @@
 import React from 'react'
 import { Menu, X } from 'lucide-react'
 import { useUserContext } from '../context/userContext'
-import { NavLink } from 'react-router-dom'
+import { Link, NavLink } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
 
 const menuItems = [
     {
         name: 'Home',
-        href: '#',
+        href: '',
     },
     {
         name: 'About',
-        href: '#',
-    },
-    {
-        name: 'Contact',
-        href: '#',
+        href: 'Detail',
     },
 ]
 
@@ -62,12 +58,12 @@ const Topbar = () => {
                     <ul className="inline-flex space-x-8">
                         {menuItems.map((item) => (
                             <li key={item.name}>
-                                <a
-                                    href={item.href}
+                                <Link
+                                    to={item.href}
                                     className="text-sm font-semibold text-gray-800 hover:text-gray-900"
                                 >
                                     {item.name}
-                                </a>
+                                </Link>
                             </li>
                         ))}
                     </ul>

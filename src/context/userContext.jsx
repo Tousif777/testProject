@@ -6,7 +6,8 @@ import {
     onAuthStateChanged,
     signOut,
     GoogleAuthProvider,
-    signInWithPopup
+    signInWithPopup,
+    updateProfile
 } from 'firebase/auth'
 import { toast } from "react-toastify";
 
@@ -30,9 +31,16 @@ const UserProvider = (props) => {
         localStorage.removeItem('user');
     };
 
-    const signUp = (email, password) => {
-        return createUserWithEmailAndPassword(auth, email, password);
-    }
+    const signUp = async (name, email, password) => {
+        try {
+          const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+          const user = userCredential.user;
+          await updateProfile(user, { displayName: name });
+          toast.success('Sign up successful!');
+        } catch (error) {
+          toast.error(error.message);
+        }
+      }
 
     const logIn = (email, password) => {
         return signInWithEmailAndPassword(auth, email, password);

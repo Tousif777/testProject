@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useUserContext } from '../context/userContext'
 import {  toast } from 'react-toastify';
@@ -11,11 +11,20 @@ const LogIn = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('')
 
+    const { user } = useUserContext();
+
+    useEffect(() => {
+      if (user) {
+        // If user is already logged in, redirect to home page
+        navigate('/');
+      }
+    }, [user, navigate]);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             await logIn(email, password);
-            navigate('/home');
+            navigate('/');
         } catch (err) {
             toast.error(err.message)
         }
@@ -25,7 +34,7 @@ const LogIn = () => {
         e.preventDefault();
         try {
             await googleLogIn();
-            navigate('/home')
+            navigate('/')
         } catch (err) {
             toast.error(err.message);
         }
