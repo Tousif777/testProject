@@ -4,6 +4,7 @@ import { db } from '../FirebaseInit';
 
 const SectorsSelect = ({ selectedSector, setSelectedSector }) => {
   const [sectors, setSectors] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchSectors = async () => {
@@ -11,13 +12,15 @@ const SectorsSelect = ({ selectedSector, setSelectedSector }) => {
         const querySnapshot = await getDocs(collection(db, 'sectors'));
         const data = querySnapshot.docs[0].data().processedData;
         setSectors(data);
+        setLoading(false);
       } catch (error) {
         console.error('Error fetching data from Firestore:', error);
+        setLoading(false);
       }
     };
 
     fetchSectors();
-  }, []);
+  }, [selectedSector]);
 
   const handleSelectChange = (event) => {
     const selectedSector = event.target.value;
@@ -35,8 +38,12 @@ const SectorsSelect = ({ selectedSector, setSelectedSector }) => {
     ));
   };
 
+  if (loading) {
+    return <p>Loading sectors...</p>;
+  }
+
   return (
-    <select onChange={handleSelectChange} defaultValue={selectedSector}>
+    <select className="w-full py-4 rounded-lg border-gray-300 text-gray-700 sm:text-sm" onChange={handleSelectChange} value={selectedSector}>
       <option value="">Select a sector</option>
       {renderOptions(sectors)}
     </select>

@@ -7,6 +7,7 @@ import Home from './pages/Home';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useUserContext } from './context/userContext';
+import DeatailsPage from './pages/DeatailsPage';
 
 const App = () => {
   const { user } = useUserContext();
@@ -18,7 +19,10 @@ const App = () => {
         <Route path="/login" element={<LogIn />} />
         <Route path="/signup" element={<SignUp />} />
         {user ? (
-          <Route path="/" element={<Home />} />
+          <>
+            <Route path="/" element={<Home />} />
+            <Route path="/detailsPage" element={<DeatailsPage />} /> 
+          </>
         ) : (
           <Route path="/" element={<Navigate to="/login" replace />} />
         )}
